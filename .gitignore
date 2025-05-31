@@ -1,0 +1,11 @@
+clearml.conf
+env/
+logs/
+.cache/
+*.safetensors
+runs/
+*.mp4
+.clearml/
+checkpoints/
+data/
+*.png
