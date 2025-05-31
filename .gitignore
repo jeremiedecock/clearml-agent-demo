@@ -9,3 +9,4 @@ runs/
 checkpoints/
 data/
 *.png
+.python_history
