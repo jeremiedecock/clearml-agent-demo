@@ -9,5 +9,6 @@
 podman run --rm -it \
            --name="clearml-agent-worker-cpu" \
            -e CLEARML_AGENT_PACKAGE_PYTORCH_RESOLVE=none \
+           -e CLEARML_WORKER_ID="$(hostname):cpu" \
            -v clearml-agent-cache-worker-cpu:/root/.clearml \
            localhost/clearml-agent:latest clearml-agent daemon --queue "worker-cpu" --foreground
