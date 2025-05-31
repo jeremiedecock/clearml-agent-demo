@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--dropout-rate', type=float, default=0.2, help='Dropout rate')
     parser.add_argument('--model-path', type=Path, default=Path('mnist_model_final.safetensors'), help='Path to save the final model')
     parser.add_argument('--remote', action='store_true', help='Run the task remotely using ClearML')
-    parser.add_argument('--remote-queue', type=str, default='worker-bi-gpu', choices=['worker-bi-gpu', 'worker-cpu'], help='ClearML remote queue to use')
+    parser.add_argument('--remote-queue', type=str, default='worker-bi-gpu', choices=['worker-bi-gpu', 'worker-single-gpu', 'worker-cpu'], help='ClearML remote queue to use')
     return parser.parse_args()
 
 
