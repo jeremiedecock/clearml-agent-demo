@@ -10,6 +10,6 @@ podman run --rm -it \
            --name="clearml-agent-worker-gpu1" \
            --device nvidia.com/gpu=1 \
            -e CLEARML_AGENT_PACKAGE_PYTORCH_RESOLVE=none \
-           -e CLEARML_WORKER_ID=$(hostname):gpu1 \
+           -e CLEARML_WORKER_ID="$(hostname):gpu1" \
            -v clearml-agent-cache-worker-gpu1:/root/.clearml \
            localhost/clearml-agent:latest clearml-agent daemon --queue "worker-single-gpu" --foreground
