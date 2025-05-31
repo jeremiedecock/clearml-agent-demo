@@ -10,5 +10,5 @@ COPY clearml.conf /root/clearml.conf
 
 WORKDIR /app
 
-# Create an empty SSH known hosts file (workaround for a clearml-agent bug that tries SSH connection even if the Git repository is cloned via HTTPS)...
+# Create an empty SSH known hosts file (workaround for a clearml-agent)...
 # RUN mkdir -p /root/.ssh && touch /root/.ssh/known_hosts
