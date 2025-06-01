@@ -28,6 +28,7 @@ pandas
 # OPTIONAL DEPENDENCIES #######################################################
 
 clearml            # https://github.com/clearml/clearml
+optuna             # for ClearML HPO
 safetensors
 tensorboard
 

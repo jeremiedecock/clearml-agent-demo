@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
         Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description='ClearML HPO Snippet')
-    parser.add_argument('--task-id', type=int, help='Task to optimize')
+    parser.add_argument('--task-id', type=str, help='Task to optimize')
     return parser.parse_args()
 
 
@@ -39,7 +39,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 # MAIN EXECUTION ###############################################################
 
-def hyper_parameter_optimization(clearml_task_id: int):
+def hyper_parameter_optimization(clearml_task_id: str):
     logger.info(f"Optimize hyper parameters of task {clearml_task_id}...")
 
     # INITIALIZING CLEARML HPO TASK ###########################################
@@ -55,7 +55,7 @@ def hyper_parameter_optimization(clearml_task_id: int):
 
         hp_optimizer = HyperParameterOptimizer(
             # specifying the task to be optimized, task must be in system already so it can be cloned
-            base_task_id=TEMPLATE_TASK_ID,
+            base_task_id=clearml_task_id,
             # setting the hyperparameters to optimize
             hyper_parameters=[
                 # UniformIntegerParameterRange('epochs', min_value=2, max_value=24, step_size=2),
@@ -84,6 +84,12 @@ def hyper_parameter_optimization(clearml_task_id: int):
 
         # logger.info("Executing HPO task locally")
         # hp_optimizer.start_locally()
+
+        hp_optimizer.set_time_limit(in_minutes=120.0)
+        hp_optimizer.wait()
+        top_hp = an_optimizer.get_top_experiments(top_k=3)
+        print([t.id for t in top_hp])
+        hp_optimizer.stop()
 
     except Exception as e:
         logger.warning(f"Failed to initialize ClearML task: {e}")
