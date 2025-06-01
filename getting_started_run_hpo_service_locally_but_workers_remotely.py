@@ -85,7 +85,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
         # logger.info("Executing HPO task locally")
         # hp_optimizer.start_locally()
 
-        hp_optimizer.set_time_limit(in_minutes=120.0)
+        # hp_optimizer.set_time_limit(in_minutes=120.0)
         hp_optimizer.wait()
         top_hp = hp_optimizer.get_top_experiments(top_k=3)
         print([t.id for t in top_hp])

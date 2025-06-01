@@ -546,6 +546,8 @@ if __name__ == "__main__":
         # Parse command line arguments
         args: argparse.Namespace = parse_args()
 
+        logger.info(f"Parsed arguments: {args}")
+
         # Train the model
         train_model(args)
 
