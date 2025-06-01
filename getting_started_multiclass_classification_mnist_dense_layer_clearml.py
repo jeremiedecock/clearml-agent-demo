@@ -312,9 +312,9 @@ def train_model(args: argparse.Namespace) -> None:
 
         # Set the Git repository for the agent to use a read-only public repository that does not require authentication
         # task.set_script(repository='https://github.com/jeremiedecock/clearml-agent-demo.git')
-        task.set_repo(repo='https://github.com/jeremiedecock/clearml-agent-demo.git')
+        # task.set_repo(repo='https://github.com/jeremiedecock/clearml-agent-demo.git')
 
-        logger.info("ClearML task initialized successfully")
+        logger.info(f"ClearML task {task.id} initialized successfully")
 
         # # Connect argparse arguments to ClearML
         # # This will log hyperparameters and allow modification from ClearML UI if run by an agent
