@@ -60,7 +60,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
             hyper_parameters=[
                 # UniformIntegerParameterRange('epochs', min_value=2, max_value=24, step_size=2),
                 # UniformIntegerParameterRange('batch_size', min_value=32, max_value=96, step_size=16),
-                UniformParameterRange('dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
+                UniformParameterRange('Args/dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
                 # UniformParameterRange('lr', min_value=0.00025, max_value=0.01, step_size=0.00025),
             ],
             # setting the objective metric we want to maximize/minimize
