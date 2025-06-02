@@ -87,10 +87,10 @@ Run a script locally inside the development container:
 
 ### Remote Execution
 
-Submit the script to a remote agent queue (e.g., `worker-bi-gpu`):
+Submit the script to a remote agent queue (e.g., `worker-single-gpu`):
 
 ```bash
-./run.sh getting_started_multiclass_classification_mnist_dense_layer_clearml.py --remote --remote-queue worker-bi-gpu
+./run.sh getting_started_multiclass_classification_mnist_dense_layer_clearml.py --remote --remote-queue worker-single-gpu
 ```
 
 ### Hyperparameter Optimization (HPO)
