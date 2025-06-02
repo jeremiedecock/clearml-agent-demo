@@ -329,8 +329,8 @@ def train_model(args: argparse.Namespace) -> None:
             logger.info("Executing task remotely, exiting process")
             task.execute_remotely(
                 queue_name=args.remote_queue,
-                clone=False,
-                exit_process=True
+                clone=False,                      # TODO: ?
+                exit_process=True                 # TODO: ?
             )
     except Exception as e:
         logger.warning(f"Failed to initialize ClearML task: {e}")
