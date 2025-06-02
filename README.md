@@ -93,13 +93,23 @@ Submit the script to a remote agent queue (e.g., `worker-bi-gpu`):
 
 ### Hyperparameter Optimization (HPO)
 
-Run HPO with ClearML (requires a valid `task_id`):
+You can run Hyperparameter Optimization using ClearML in two different configurations. A valid `task_id` is required in both cases; it can be obtained from the ClearML Web UI after submitting a task.
+
+#### Option 1: Run the HPO Coordinator Locally, Workers Remotely
+
+In this setup, the HPO service (coordinator) runs locally on your machine, while the optimization workers run as remote ClearML agents.
 
 ```bash
 ./run.sh getting_started_run_hpo_service_locally_but_workers_remotely.py --task-id <task_id>
 ```
 
-your can find the `task_id` in the ClearML web UI after submitting a task.
+#### Option 2: Run Both HPO Coordinator and Workers Remotely
+
+In this setup, both the HPO service and the workers run as remote ClearML agents.
+
+```bash
+./run.sh getting_started_run_hpo_service_remotely.py --task-id <task_id>
+```
 
 
 ## Notes
