@@ -48,7 +48,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
     try:
         task = Task.init(
             project_name="Snippets",
-            task_name="MNIST Dense Layers HPO",
+            task_name="HPO",
             task_type=Task.TaskTypes.optimizer,
             reuse_last_task_id=False
         )
@@ -67,7 +67,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
                 # UniformParameterRange('Args/dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
                 UniformParameterRange('Args/lr', min_value=0.00025, max_value=0.01, step_size=0.00025),
                 UniformIntegerParameterRange('Args/num_hidden_layers', min_value=1, max_value=4, step_size=1),
-                UniformIntegerParameterRange('Args/hidden_layer_size', min_value=16, max_value=256, step_size=16),
+                UniformIntegerParameterRange('Args/hidden_layer_size', min_value=16, max_value=512, step_size=16),
             ],
             # setting the objective metric we want to maximize/minimize
             objective_metric_title='Accuracy',
@@ -80,7 +80,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
             max_number_of_concurrent_tasks=2,
             optimization_time_limit=60.,
             compute_time_limit=120,
-            total_max_jobs=20,
+            total_max_jobs=50,
             min_iteration_per_job=15000,
             max_iteration_per_job=150000,
         )
