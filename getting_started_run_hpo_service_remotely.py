@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
         Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description='ClearML HPO Snippet')
-    parser.add_argument('--task-id', type=int, help='Task to optimize')
+    parser.add_argument('--task-id', type=str, help='Task to optimize')
     return parser.parse_args()
 
 
@@ -39,82 +39,42 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 # MAIN EXECUTION ###############################################################
 
-def train_model(args: argparse.Namespace) -> int:
-    """
-    Train the neural network model on the MNIST dataset.
+def hyper_parameter_optimization(clearml_task_id: str):
+    logger.info(f"Optimize hyper parameters of task {clearml_task_id}...")
 
-    Parameters
-    ----------
-    args : argparse.Namespace
-        Command line arguments containing training configuration.
-    """
+    # INITIALIZING CLEARML HPO TASK ###########################################
 
     task: Optional[Task] = None
     try:
-        # Always initialize ClearML before anything else to let automatic hooks track as much as possible
         task = Task.init(
             project_name="Snippets",
-            task_name="MNIST Dense Layers",
-            task_type=Task.TaskTypes.optimizer, # TODO?
-            reuse_last_task_id=False,           # TODO?
+            task_name="MNIST Dense Layers HPO",
+            task_type=Task.TaskTypes.optimizer,
+            reuse_last_task_id=False
         )
 
         # Set the Git repository for the agent to use a read-only public repository that does not require authentication
         # task.set_script(repository='https://github.com/jeremiedecock/clearml-agent-demo.git')
         task.set_repo(repo='https://github.com/jeremiedecock/clearml-agent-demo.git')
 
-        logger.info(f"ClearML task {task.id} initialized successfully")
-
-        if args.remote:
-            logger.info("Executing task remotely, exiting process")
-            task.execute_remotely(
-                queue_name=args.remote_queue,
-                clone=False,
-                exit_process=True,              # TODO ???
-            )
-    except Exception as e:
-        logger.warning(f"Failed to initialize ClearML task: {e}")
-
-
-def hyper_parameter_optimization(clearml_task_id: int):
-    logger.info(f"Optimize hyper parameters of task {clearml_task_id}...")
-
-    # INITIALIZING CLEARML HPO TASK ###########################################
-
-    # TODO ?
-    # task: Optional[Task] = None
-    try:
-        # TODO ?
-        # task = Task.init(
-        #     project_name="Snippets",
-        #     task_name="MNIST Dense Layers HPO",
-        #     task_type=Task.TaskTypes.optimizer,
-        #     reuse_last_task_id=False
-        # )
-
-        # Set the Git repository for the agent to use a read-only public repository that does not require authentication
-        # task.set_script(repository='https://github.com/jeremiedecock/clearml-agent-demo.git')
-        # TODO ?
-        # task.set_repo(repo='https://github.com/jeremiedecock/clearml-agent-demo.git')
-
         hp_optimizer = HyperParameterOptimizer(
             # specifying the task to be optimized, task must be in system already so it can be cloned
-            base_task_id=TEMPLATE_TASK_ID,
+            base_task_id=clearml_task_id,
             # setting the hyperparameters to optimize
             hyper_parameters=[
-                # UniformIntegerParameterRange('epochs', min_value=2, max_value=24, step_size=2),
-                # UniformIntegerParameterRange('batch_size', min_value=32, max_value=96, step_size=16),
-                UniformParameterRange('dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
-                # UniformParameterRange('lr', min_value=0.00025, max_value=0.01, step_size=0.00025),
+                # UniformIntegerParameterRange('Args/epochs', min_value=2, max_value=24, step_size=2),
+                # UniformIntegerParameterRange('Args/batch_size', min_value=32, max_value=96, step_size=16),
+                # UniformParameterRange('Args/dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
+                UniformParameterRange('Args/lr', min_value=0.00025, max_value=0.01, step_size=0.00025),
             ],
             # setting the objective metric we want to maximize/minimize
             objective_metric_title='Accuracy',
-            objective_metric_series='test',    # TODO?
+            objective_metric_series='test',      # TODO?
             objective_metric_sign='max',
             # setting hp_optimizer
             optimizer_class=OptimizerOptuna,
             # configuring optimization parameters
-            execution_queue=args.remote_queue,
+            execution_queue="worker-bi-gpu",     # TODO: La queue d'execution des taches executées (et non pas du service HPO)
             max_number_of_concurrent_tasks=2,
             optimization_time_limit=60.,
             compute_time_limit=120,
@@ -123,12 +83,19 @@ def hyper_parameter_optimization(clearml_task_id: int):
             max_iteration_per_job=150000,
         )
 
-        if args.remote:
-            logger.info("Executing HPO task remotely, exiting process")
-            hp_optimizer.start()
-        else:
-            logger.info("Executing HPO task locally")
-            hp_optimizer.start_locally()
+        logger.info(f"Executing HPO task {task.id} remotely, exiting process")
+        task.execute_remotely(queue_name='worker-cpu', exit_process=True)    # TODO: <<<
+
+        hp_optimizer.start()
+
+        # logger.info("Executing HPO task locally")
+        # hp_optimizer.start_locally()
+
+        # hp_optimizer.set_time_limit(in_minutes=120.0)
+        hp_optimizer.wait()
+        top_hp = hp_optimizer.get_top_experiments(top_k=3)
+        print([t.id for t in top_hp])
+        hp_optimizer.stop()
 
     except Exception as e:
         logger.warning(f"Failed to initialize ClearML task: {e}")
