@@ -77,7 +77,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
             optimizer_class=OptimizerOptuna,
             # configuring optimization parameters
             execution_queue="worker-single-gpu",     # TODO: La queue d'execution des taches executées (et non pas du service HPO)
-            max_number_of_concurrent_tasks=2,
+            max_number_of_concurrent_tasks=4,
             optimization_time_limit=60.,
             compute_time_limit=120,
             total_max_jobs=50,
