@@ -33,9 +33,9 @@ def parse_args() -> argparse.Namespace:
         Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description='CIFAR-10 Classification with PyTorch')
-    parser.add_argument('--num-hidden-layers', type=int, default=3, help='Number of hidden layers in the neural network')
-    parser.add_argument('--hidden-layer-size', type=int, default=128, help='Number of neurons per hidden layer')
-    parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
+    parser.add_argument('--num-hidden-layers', type=int, default=2, help='Number of hidden layers in the neural network')
+    parser.add_argument('--hidden-layer-size', type=int, default=512, help='Number of neurons per hidden layer')
+    parser.add_argument('--lr', type=float, default=0.0025, help='Learning rate')
     parser.add_argument('--batch-size', type=int, default=64, help='Batch size for training')
     parser.add_argument('--dropout-rate', type=float, default=0.2, help='Dropout rate')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
