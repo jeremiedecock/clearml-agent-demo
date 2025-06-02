@@ -66,8 +66,8 @@ def hyper_parameter_optimization(clearml_task_id: str):
                 # UniformIntegerParameterRange('Args/batch_size', min_value=32, max_value=96, step_size=16),
                 # UniformParameterRange('Args/dropout_rate', min_value=0, max_value=0.5, step_size=0.05),
                 UniformParameterRange('Args/lr', min_value=0.00025, max_value=0.01, step_size=0.00025),
-                UniformParameterRange('Args/num_hidden_layers', min_value=1, max_value=4, step_size=1),
-                UniformParameterRange('Args/hidden_layer_size', min_value=16, max_value=256, step_size=16),
+                UniformIntegerParameterRange('Args/num_hidden_layers', min_value=1, max_value=4, step_size=1),
+                UniformIntegerParameterRange('Args/hidden_layer_size', min_value=16, max_value=256, step_size=16),
             ],
             # setting the objective metric we want to maximize/minimize
             objective_metric_title='Accuracy',
