@@ -33,14 +33,16 @@ def parse_args() -> argparse.Namespace:
         Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description='MNIST Classification with PyTorch')
-    parser.add_argument('--batch-size', type=int, default=64, help='Batch size for training')
-    parser.add_argument('--epochs', type=int, default=15, help='Number of epochs')
+    parser.add_argument('--num-hidden-layers', type=int, default=2, help='Number of hidden layers in the neural network')
+    parser.add_argument('--hidden-layer-size', type=int, default=64, help='Number of neurons per hidden layer')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
+    parser.add_argument('--batch-size', type=int, default=64, help='Batch size for training')
+    parser.add_argument('--dropout-rate', type=float, default=0.2, help='Dropout rate')
+    parser.add_argument('--epochs', type=int, default=15, help='Number of epochs')
     parser.add_argument('--device', type=str, default='auto', choices=['auto', 'cpu', 'cuda', 'mps'], help='Device to use')
     parser.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility')
     parser.add_argument('--save-interval', type=int, default=5, help='Save model every N epochs')
     parser.add_argument('--patience', type=int, default=5, help='Early stopping patience')
-    parser.add_argument('--dropout-rate', type=float, default=0.2, help='Dropout rate')
     parser.add_argument('--model-path', type=Path, default=Path('mnist_model_final.safetensors'), help='Path to save the final model')
     parser.add_argument('--remote', action='store_true', help='Run the task remotely using ClearML')
     parser.add_argument('--remote-queue', type=str, default='worker-bi-gpu', choices=['worker-bi-gpu', 'worker-single-gpu', 'worker-cpu'], help='ClearML remote queue to use')
@@ -107,6 +109,10 @@ class NeuralNetwork(nn.Module):
     ----------
     dropout_rate : float, optional
         Dropout rate to use in dropout layers (default is 0.).
+    num_hidden_layers : int, optional
+        Number of hidden layers (default is 2).
+    hidden_layer_size : int, optional
+        Number of neurons per hidden layer (default is 64).
 
     Attributes
     ----------
@@ -115,20 +121,22 @@ class NeuralNetwork(nn.Module):
     linear_relu_stack : nn.Sequential
         Sequential stack of linear, ReLU, and dropout layers.
     """
-    def __init__(self, dropout_rate: float=0.) -> None:
+    def __init__(self, dropout_rate: float=0., num_hidden_layers: int=2, hidden_layer_size: int=64) -> None:
         super().__init__()
 
         self.flatten: nn.Flatten = nn.Flatten()
 
-        self.linear_relu_stack: nn.Sequential = nn.Sequential(
-            nn.Linear(28*28, 64),
-            nn.ReLU(),
-            nn.Dropout(dropout_rate),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Dropout(dropout_rate),
-            nn.Linear(64, 10)
-        )
+        layers: list[nn.Linear|nn.ReLU|nn.Dropout] = []
+        input_size = 28 * 28
+        for i in range(num_hidden_layers):
+            out_size = hidden_layer_size
+            layers.append(nn.Linear(input_size, out_size))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout_rate))
+            input_size = out_size
+        layers.append(nn.Linear(input_size, 10))
+
+        self.linear_relu_stack: nn.Sequential = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -364,7 +372,7 @@ def train_model(args: argparse.Namespace) -> None:
     device: torch.device = get_device(args.device)
     logger.info(f"Using device: {device}")
 
-    model = NeuralNetwork(dropout_rate=args.dropout_rate).to(device)
+    model = NeuralNetwork(dropout_rate=args.dropout_rate, num_hidden_layers=args.num_hidden_layers, hidden_layer_size=args.hidden_layer_size).to(device)
     logger.info(f"Model created with {sum(p.numel() for p in model.parameters())} parameters")
 
     # OPTIMIZE THE MODEL PARAMETERS ###########################################
