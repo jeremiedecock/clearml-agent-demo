@@ -521,85 +521,85 @@ def train_model(args: argparse.Namespace) -> None:
         logger.info("Final model uploaded as ClearML artifact")
 
 
-def test_model(args: argparse.Namespace) -> None:
-    """
-    Test the trained model on a subset of the CIFAR-10 test dataset and report predictions.
+# def test_model(args: argparse.Namespace) -> None:
+#     """
+#     Test the trained model on a subset of the CIFAR-10 test dataset and report predictions.
 
-    Parameters
-    ----------
-    args : argparse.Namespace
-        Command line arguments containing configuration and model path.
-    """
-    device: torch.device = get_device(args.device)
-    logger.info(f"Using device: {device}")
+#     Parameters
+#     ----------
+#     args : argparse.Namespace
+#         Command line arguments containing configuration and model path.
+#     """
+#     device: torch.device = get_device(args.device)
+#     logger.info(f"Using device: {device}")
 
-    # Load the model (safetensors format)
-    model = NeuralNetwork()
-    try:
-        safetensors.torch.load_model(model, args.model_path)
-        logger.info(f"Model loaded from {args.model_path}")
-    except Exception as e:
-        logger.error(f"Failed to load model: {e}")
-        return
+#     # Load the model (safetensors format)
+#     model = NeuralNetwork()
+#     try:
+#         safetensors.torch.load_model(model, args.model_path)
+#         logger.info(f"Model loaded from {args.model_path}")
+#     except Exception as e:
+#         logger.error(f"Failed to load model: {e}")
+#         return
 
-    model.to(device)
-    model.eval()
+#     model.to(device)
+#     model.eval()
 
-    # Load CIFAR-10 test dataset
-    # Compute mean/std from training set for normalization
-    data_dir = Path("data")
-    base_transform = ToTensor()
-    training_data_for_stats = datasets.CIFAR10(root=data_dir, train=True, download=True, transform=base_transform)
-    mean, std = compute_mean_std(training_data_for_stats)
-    logger.info(f"Computed mean: {mean}, std: {std} (for test normalization)")
-    transform = Compose([
-        ToTensor(),
-        Normalize(mean, std)
-    ])
-    test_data = datasets.CIFAR10(root="data", train=False, download=True, transform=transform)
+#     # Load CIFAR-10 test dataset
+#     # Compute mean/std from training set for normalization
+#     data_dir = Path("data")
+#     base_transform = ToTensor()
+#     training_data_for_stats = datasets.CIFAR10(root=data_dir, train=True, download=True, transform=base_transform)
+#     mean, std = compute_mean_std(training_data_for_stats)
+#     logger.info(f"Computed mean: {mean}, std: {std} (for test normalization)")
+#     transform = Compose([
+#         ToTensor(),
+#         Normalize(mean, std)
+#     ])
+#     test_data = datasets.CIFAR10(root="data", train=False, download=True, transform=transform)
 
-    # Take the first 16 images for inference
-    n_samples = 16
-    images, labels = zip(*[test_data[i] for i in range(n_samples)])
-    images_tensor = torch.stack(images).to(device)
+#     # Take the first 16 images for inference
+#     n_samples = 16
+#     images, labels = zip(*[test_data[i] for i in range(n_samples)])
+#     images_tensor = torch.stack(images).to(device)
 
-    with torch.no_grad():
-        outputs = model(images_tensor)
-        preds = outputs.argmax(dim=1).cpu().numpy()
+#     with torch.no_grad():
+#         outputs = model(images_tensor)
+#         preds = outputs.argmax(dim=1).cpu().numpy()
 
-    # Display with matplotlib
-    fig, axes = plt.subplots(4, 4, figsize=(8, 8))
-    for i, ax in enumerate(axes.flat):
-        # Unnormalize for display
-        img = images[i].cpu().numpy()
-        img = img.transpose(1, 2, 0)
-        img = img * np.array(std) + np.array(mean)
-        img = np.clip(img, 0, 1)
-        ax.imshow(img)
-        ax.set_title(f"Pred: {preds[i]}, True: {labels[i]}")
-        ax.axis('off')
-    plt.tight_layout()
+#     # Display with matplotlib
+#     fig, axes = plt.subplots(4, 4, figsize=(8, 8))
+#     for i, ax in enumerate(axes.flat):
+#         # Unnormalize for display
+#         img = images[i].cpu().numpy()
+#         img = img.transpose(1, 2, 0)
+#         img = img * np.array(std) + np.array(mean)
+#         img = np.clip(img, 0, 1)
+#         ax.imshow(img)
+#         ax.set_title(f"Pred: {preds[i]}, True: {labels[i]}")
+#         ax.axis('off')
+#     plt.tight_layout()
 
-    # Save the figure temporarily
-    fig_path = "cifar10_predictions.png"
-    plt.savefig(fig_path)
-    plt.close(fig)
+#     # Save the figure temporarily
+#     fig_path = "cifar10_predictions.png"
+#     plt.savefig(fig_path)
+#     plt.close(fig)
 
-    # Report the image to ClearML if possible
-    try:
-        task = Task.current_task()
-        if task:
-            task.get_logger().report_image(
-                title="CIFAR-10 Predictions",
-                series="Test Samples",
-                local_path=fig_path,
-                iteration=0
-            )
-            logger.info("Sample predictions reported to ClearML")
-    except Exception as e:
-        logger.warning(f"Could not report image to ClearML: {e}")
+#     # Report the image to ClearML if possible
+#     try:
+#         task = Task.current_task()
+#         if task:
+#             task.get_logger().report_image(
+#                 title="CIFAR-10 Predictions",
+#                 series="Test Samples",
+#                 local_path=fig_path,
+#                 iteration=0
+#             )
+#             logger.info("Sample predictions reported to ClearML")
+#     except Exception as e:
+#         logger.warning(f"Could not report image to ClearML: {e}")
 
-    logger.info("Sample predictions completed")
+#     logger.info("Sample predictions completed")
 
 
 if __name__ == "__main__":
@@ -615,8 +615,8 @@ if __name__ == "__main__":
         # Train the model
         train_model(args)
 
-        # Test the model
-        test_model(args)
+        # # Test the model
+        # test_model(args)
     except KeyboardInterrupt:
         logger.info("Training interrupted by user")
     except Exception as e:
