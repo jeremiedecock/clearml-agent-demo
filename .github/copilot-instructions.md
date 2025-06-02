@@ -1,0 +1,1 @@
+All project files—including source code, configuration files, and others—must be written entirely in English. This includes comments, variable names, and any other identifiers within the source code.
