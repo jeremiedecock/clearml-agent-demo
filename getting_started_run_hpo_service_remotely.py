@@ -71,7 +71,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
             ],
             # setting the objective metric we want to maximize/minimize
             objective_metric_title='Accuracy',
-            objective_metric_series='test',      # TODO?
+            objective_metric_series='test',      # TODO
             objective_metric_sign='max',
             # setting hp_optimizer
             optimizer_class=OptimizerOptuna,
@@ -86,7 +86,7 @@ def hyper_parameter_optimization(clearml_task_id: str):
         )
 
         logger.info(f"Executing HPO task {task.id} remotely, exiting process")
-        task.execute_remotely(queue_name='worker-cpu', exit_process=True)    # TODO: <<<
+        task.execute_remotely(queue_name='hpo-coordinator', exit_process=True)    # TODO: <<<
 
         hp_optimizer.start()
 

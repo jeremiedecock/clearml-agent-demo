@@ -36,6 +36,7 @@ Ensure the following queues exist on your ClearML server (e.g., [https://app.cle
 * `worker-cpu`
 * `worker-bi-gpu`
 * `worker-single-gpu`
+* `hpo-coordinator`
 
 ### 6. Launch ClearML Agent Containers
 
@@ -46,6 +47,7 @@ Start ClearML agents in separate Podman containers. A `tmux` session is recommen
 ./run-clearml-agent-worker-bi-gpu.sh
 ./run-clearml-agent-worker-gpu0.sh
 ./run-clearml-agent-worker-gpu1.sh
+./run-clearml-agent-hpo-coordinator.sh
 ```
 
 
